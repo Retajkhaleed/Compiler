@@ -1,0 +1,135 @@
+Program : PROGRAM ID LPAREN IdentifierList RPAREN SEMICOLON 
+          TypeDefinitions 
+          VariableDeclarations 
+          SubprogramDeclarations 
+          CompoundStatement 
+          DOT;
+
+TypeDefinitions : 
+          /* empty */
+        | TYPE TypeDefinition SEMICOLON
+        | TypeDefinitions TypeDefinition SEMICOLON
+        ;
+
+TypeDefinition : ID EQUAL Type;
+
+VariableDeclarations : 
+          /* empty */
+        | VAR VariableDeclaration SEMICOLON
+        | VariableDeclarations VariableDeclaration SEMICOLON
+        ;
+
+VariableDeclaration : IdentifierList COLON Type;
+
+SubprogramDeclarations : 
+          /* empty */
+        | SubprogramDeclaration SEMICOLON
+        | SubprogramDeclarations SubprogramDeclaration SEMICOLON
+        ;
+
+SubprogramDeclaration : ProcedureDeclaration
+                      | FunctionDeclaration;
+
+ProcedureDeclaration : PROCEDURE ID LPAREN FormalParameterList RPAREN SEMICOLON ProcedureBody;
+
+FunctionDeclaration : FUNCTION ID LPAREN FormalParameterList RPAREN COLON ResultType SEMICOLON ProcedureBody;
+
+ProcedureBody : Block
+              | FORWARD;
+
+FormalParameterList : 
+          /* empty */
+        | IdentifierList COLON Type
+        | FormalParameterList SEMICOLON IdentifierList COLON Type;
+
+Block : VariableDeclarations CompoundStatement;
+
+CompoundStatement : PBEGIN StatementSequence END;
+
+StatementSequence : Statement
+                  | StatementSequence SEMICOLON Statement;
+
+Statement : SimpleStatement
+          | StructuredStatement;
+
+SimpleStatement : 
+          /* empty */
+        | AssignmentStatement
+        | ProcedureStatement;
+
+AssignmentStatement : Variable ASSIGN Expression;
+
+ProcedureStatement : ID LPAREN ActualParameterList RPAREN;
+
+StructuredStatement : CompoundStatement
+                    | IF Expression THEN Statement
+                    | IF Expression THEN Statement ELSE Statement
+                    | WHILE Expression DO Statement
+                    | FOR ID ASSIGN Expression TO Expression DO Statement;
+
+Type : ID
+     | ARRAY LBRACKET Constant DOTDOT Constant RBRACKET OF Type
+     | RECORD FieldList END;
+
+ResultType : ID;
+
+FieldList : 
+          /* empty */
+        | IdentifierList COLON Type
+        | FieldList SEMICOLON IdentifierList COLON Type;
+
+Constant : Sign INT;
+
+Expression : SimpleExpression
+           | SimpleExpression RelationalOp SimpleExpression;
+
+RelationalOp : LESS 
+             | LESSEQUAL
+             | GREATER
+             | GREATEREQUAL
+             | NOTEQUAL
+             | EQUAL;
+
+SimpleExpression : 
+          /* empty */
+        | Sign Term
+        | SimpleExpression AddOp Term;
+
+AddOp : PLUS
+      | MINUS
+      | OR;
+
+Term : Factor
+     | Term MulOp Factor;
+
+MulOp : MULT
+      | DIV
+      | MOD
+      | AND;
+
+Factor : INT
+       | STR
+       | Variable
+       | FunctionReference
+       | NOT Factor
+       | LPAREN Expression RPAREN;
+
+FunctionReference : ID LPAREN ActualParameterList RPAREN;
+
+Variable : ID ComponentSelection;
+
+ComponentSelection : 
+          /* empty */
+        | DOT ID ComponentSelection
+        | LBRACKET Expression RBRACKET ComponentSelection;
+
+ActualParameterList : 
+          /* empty */
+        | Expression
+        | ActualParameterList COMMA Expression;
+
+IdentifierList : ID
+               | IdentifierList COMMA ID;
+
+Sign : PLUS
+     | MINUS;
