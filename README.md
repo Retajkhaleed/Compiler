@@ -45,6 +45,3 @@ gcc lex.yy.c y.tab.c -o compiler
 
 
 
-yacc -d parser.y
-gcc lex.yy.c y.tab.c -o compiler
-./compiler < test.pas
